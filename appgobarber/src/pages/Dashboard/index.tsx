@@ -7,11 +7,11 @@ import { Container, Header, HeaderTitle, UserName, ProfileButton, UserAvatar } f
 
 const Dashboard: React.FC = () => {
   const { signOut, user } = useAuth();
-  const navigation = useNavigation();
+  const { navigate } = useNavigation();
 
   const navigateToProfile = useCallback(() => {
-
-  }, []);
+    navigate('Profile');
+  }, [navigate]);
 
   return (
     <Container>
@@ -21,8 +21,8 @@ const Dashboard: React.FC = () => {
           <UserName>{user.name}</UserName>
         </HeaderTitle>
 
-        <ProfileButton onPress={() => {}}>
-          <UserAvatar source={{ uri: user.avatar_url }} />
+        <ProfileButton onPress={navigateToProfile}>
+          <UserAvatar source={{ uri: 'http://192.168.100.5:3333/files/3694044bd1ab7fe4b242-profile.jpg' }} />
         </ProfileButton>
       </Header>
     </Container>
