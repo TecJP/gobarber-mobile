@@ -1,16 +1,52 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 
+import api from '../../services/api';
 import { useAuth } from '../../hooks/auth';
 
-import { Container, Header, HeaderTitle, UserName, ProfileButton, UserAvatar } from './styles';
+import {
+  Container,
+  Header,
+  HeaderTitle,
+  UserName,
+  ProfileButton,
+  UserAvatar,
+  ProvidersList,
+  ProvidersListTitle,
+  ProviderContainer,
+  ProviderAvatar,
+  ProviderInfo,
+  ProviderName,
+  ProviderMeta,
+  ProviderMetaText,
+} from './styles';
+
+export interface Provider {
+  id: string;
+  name: string;
+  avatar_url: string;
+}
 
 const Dashboard: React.FC = () => {
+  const [providers, setProviders] = useState<Provider[]>([]);
+
   const { signOut, user } = useAuth();
   const { navigate } = useNavigation();
 
+  useEffect(() => {
+    api.get('/providers').then(response => {
+      setProviders(response.data);
+    });
+  }, []);
+
   const navigateToProfile = useCallback(() => {
-    navigate('Profile');
+    // navigate('Profile');
+    signOut();
+  }, [signOut]);
+
+  const navigateToCreateAppointment = useCallback((providerId: string) => {
+    navigate('CreateAppointment', { providerId });
   }, [navigate]);
 
   return (
@@ -22,9 +58,37 @@ const Dashboard: React.FC = () => {
         </HeaderTitle>
 
         <ProfileButton onPress={navigateToProfile}>
-          <UserAvatar source={{ uri: 'http://192.168.100.5:3333/files/3694044bd1ab7fe4b242-profile.jpg' }} />
+          <UserAvatar source={{ uri: user.avatar_url }} />
         </ProfileButton>
       </Header>
+
+      <ProvidersList
+        data={providers}
+        keyExtractor={(provider) => provider.id}
+        ListHeaderComponent={
+          <ProvidersListTitle>Cabeleireios</ProvidersListTitle>
+        }
+        renderItem={({ item: provider }) => (
+          <ProviderContainer onPress={() => navigateToCreateAppointment(provider.id)}>
+            <ProviderAvatar source={{ uri: provider.avatar_url }} />
+
+            <ProviderInfo>
+              <ProviderName>{provider.name}</ProviderName>
+
+              <ProviderMeta>
+                <Icon name="calendar" size={14} color="#ff9000" />
+
+                <ProviderMetaText>Segunda à sexta</ProviderMetaText>
+              </ProviderMeta>
+
+              <ProviderMeta>
+                <Icon name="clock" size={14} color="#ff9000" />
+                <ProviderMetaText>8h às 18h</ProviderMetaText>
+              </ProviderMeta>
+            </ProviderInfo>
+          </ProviderContainer>
+        )}
+      />
     </Container>
   );
 };
