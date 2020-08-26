@@ -32,7 +32,7 @@ import {
 
 interface SignUpFormData {
   name: string;
-  emial: string;
+  email: string;
   password: string;
 }
 
